@@ -18,7 +18,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         node: [20, 22, 23]
 
-    steps:
+    steps: #github says theres a yml error here and its an invalid file??!!
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
@@ -34,7 +34,7 @@ jobs:
       - name: 🔍 Format & Lint
         run: npm run biome:ci
 
-      -name: Are The Types Wrong?
+      - name: Are The Types Wrong?
         run: npm run attw
 
       - name: 🧪 Run Tests with Coverage
