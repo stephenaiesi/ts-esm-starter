@@ -9,8 +9,55 @@ on:
       - main
 
 jobs:
-  build:
-    name: 🏗️ Build & Test on ${{ matrix.os }} with Node.js ${{ matrix.node }}
+  biome-checks:
+    name: Run biome checks  (format, lint and import sorting)
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚡️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Format & Lint
+        run: npm run biome:ci
+  
+
+  typecheck:
+    needs: biome-checks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 22, 23]
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚡️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Type Checking (tsc)
+        run: npm run typecheck
+
+      - name: 🛠️ Are The Types Wrong?
+        run: npm run attw
+
+
+  tests:
+    needs: typecheck
+    name: Run tests and coverage on ${{ matrix.os }} with Node.js ${{ matrix.node }}
     runs-on: ${{ matrix.os }}
     
     strategy:
@@ -30,12 +77,6 @@ jobs:
 
       - name: 📦 Install dependencies
         run: npm ci
-
-      - name: 🔍 Format & Lint
-        run: npm run biome:ci
-
-      - name: Are The Types Wrong?
-        run: npm run attw
 
       - name: 🧪 Run Tests with Coverage
         run: npm run test
