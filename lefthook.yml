@@ -1,8 +1,10 @@
 pre-commit:
   parallel: true
   commands:
-    run-checks(format, lint, typecheck, attw):
+    run-checks(format, lint, imports):
       run: npm run check
+    tsc-typecheck:
+      run: npm run typecheck
 
 commit-msg:
   commands:
@@ -12,7 +14,11 @@ commit-msg:
 pre-push:
   parallel: true
   commands:
-    run-checks(format, lint, typecheck, attw):
+    run-checks(format, lint, imports):
       run: npm run check
+    tsc-typecheck:
+      run: npm run typecheck
+    are-the-types-wrong:
+      run: npm run attw
     run-tests(vitest, coverage-v8):
       run: npm run test

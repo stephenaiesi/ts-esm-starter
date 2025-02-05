@@ -1,55 +1,71 @@
 # ts-package-starter
-A starter repo to kick-start your next typescript package.
+A starter repo to kick-start your next esm typescript package. Though somewhat opinionated, it is fairly lightweight and easy to customize.
 
 ## Features
-- Typescript ready, so you can focus on your code
-- Testing with `jest` and `ts-jest`
-- Linting and Formatting with `biome`
-- Auto-Document your API with `typedoc`
+- `Typescript` ready, so you can focus on your code
+- Esm first for modern library development
+- Linting, formatting and import sorting with `biome`
 - `AreTheTypesWrong` to check for client-side type errors
-- Commit linting with `commitlint`
+- Testing and coverage with `vitest`
+- Auto-Document your API with `typedoc`
+- Commit linting with `commitlint` enforcing conventional commits
 - Git Hooks with `lefthook`
-- Reccomended VsCode/Codium plugins and settings
 - Starter Github Workflows for ci, coverage and auto-publish
-- Npm package ready:
-    - Npm scripts tying it all together
-    - Version Management
-    - Changelog management
-    - Publishing 
+- Reccomended VsCode/Codium plugins and settings
+
+## Getting Started
+1. Clone the repo and cd into it
+```shell
+git clone https://github.com/stephenaiesi/ts-package-starter.git my-project
+
+cd my-project
+```
+
+2. Run the initialization script and provide a name and description for your package. This will update your package.json and README.md files then eject itself.
+```shell
+npm run init
+```
+
+3. Start up the typescript and test watchers and begin developing:
+```shell
+npm run dev
+```
+
 
 ### Typescript Support
 Typescript comes pre configured and ready to build.
 
-There is a `tsconfig.json` in the root directory that is not intended to build with directly but is there to provide default configurations to extend from and to appease the IDE.
+The root `./tsconfig.json` provides common configurations that can be extended from.
 
-There are some basic build configurations in there roughly akin to a `node-lts` configuration. By default this configuration comes with the majority of strict flags turned ON.  I think its better to have all of this on by default and turn off what you dont need when you know why you dont need it.
+`./src/tsconfig.json` will provide the production build configuration.
 
-Then there is `./src/tsconfig.json` that is intended for building your source files. By default, the output is in CommonJS format and the js output is sent to `./dist/cjs` and the type declarations are sent to `./dist/types`.
+`./src/tsconfig.dev.json` will provide the development build configuration.
 
-If you want an esm build, run the scripts/build  script.  If you want a hybrid build, run the scripts/build-dual script, and if you want a hybrid-build that needs to hold state, run the scripts/build-wrapper script.
+`./tests/tsconfig.json` will provide the test build configuration for vitest.
+
 
 ### Testing
-A few assumptions have been made in the jest configuration, all of which are easy to change if you wish:
+A few assumptions have been made in the vitest setup, all of which are easy to change
 
-1. The jest configuration is at `./tests/jest.config.ts`.
-2. Jest looks for tests only in the `./tests` directory
-3. Tests are identified by thier extension, so the `unit`, `integration` and `e2e` folders are mere suggestions. Jest will recursively search subfolders of `./tests` for the following extensions:
-    - `.spec.ts`
-    - `.test.ts`
-    - `.e2e.ts`
-4. The tests have their own `tsconfig.json` in the `./tests` folder where the ts-jest configuration is pointed to. Adding jest's types here keeps them from polluting our build configuration and keeps our IDE happy.
+1. Tests are searched for in the `./tests` folder
+2. The vitest config is at `./tests/vitest.config.ts`
+3. There is a `./tests/tsconfig.json` file for loading vitest types in your test files
+4. Unit tests are named `*.spec.ts`
+5. Functional are named `*.test.ts`
+6. Coverage is enabled and set to 100%
+6
 
 ### Linting And Formatting
-Originally prettier, eslint and typescript-eslint, now biomejs is the configured linter and formatter. The reasons for choosing biome, other than being my preferred tool, are the following:
+Formatting, linting and import sorting is setup with `biome`.  You can customize the settings for biome in `./biome.json`.
 
 #### One Dependency, One Config File
-With the eslint-style setup, you need to have prettier, eslint, typescript-eslint, the @typescript/eslint-plugin @typescript/eslint-parser packages and esbuild-config-prettier to prevent conflicts between eslint and prettier, summning up to at least 6 dependencies and two configuration files. Shipping with biome essentially makes it easier to swap out tools should a user prefer.
+With the eslint-style setup, you need to have prettier, eslint, typescript-eslint, the @typescript/eslint-plugin @typescript/eslint-parser packages and esbuild-config-prettier to prevent conflicts between eslint and prettier, summning up to at least 6 dependencies and two configuration files. Shipping with biome essentially makes it easier to swap out tools should you prefer.
 
 #### Easy Configuration
 Eslint's configuraion already had so much cognitive overhead, and the new flat-config style has been frustrating to integrate with the various tools. I find the biome configuration much more pleasant.
 
 #### Super Fast
-Bieng written in rust, biome is truly very fast.  It makes it nice when you are running linting and formatting on several triggers in your workflow.
+Bieng written in rust, biome is fast.  It makes it nice when you are running linting and formatting on several triggers in your workflow.
 
 #### Just Works
 From configuration to typescript integration, biome just works!
@@ -57,41 +73,43 @@ From configuration to typescript integration, biome just works!
  #### IDE Integration
  The `./.vscode` folder contains the plugin reccomendation and configurations to use biome in VsCode.
 
-#### Don't Want To Use Biome?
-Easy peasy, just uninstall and remove the configuration file.
-```sh
-npm uninstall biome
-rimraf ./biome.json
-done
-```
-After setting up your preferred formatter and linter, make sure you edit your npm scripts in `package.json` to use these tools.
 
 ### Documentation Generation
 Api documentation is setup with `typedoc`. Just annotate your code with `TsDoc` (or `JsDoc`) and typedoc will generate documentation for your library's api.
 
 The configuration file is at `./typedoc.json`. It is preconfigured to document any api's exposed through the `./src/index.ts` entry point and output to the `./docs` directory.
+```shell
+npm run build:docs
+```
 
 ### Are The Types Wrong?
 Before distributing your package, use this tool to check for common type errors
 ```shell
-npm run build && npm run attw
+npm run attw
 ```
+
+### Conventional Commits with `commitlint`
+Conventional commits are enforced with `commitlint` and `@commitlint/config-conventional`.  You can customize the settings for commitlint in `./.commitlint.config.js`.
 
 ### Git Hooks
 Git Hooks are set up with the `lefthook` package. You can find the following hook configuration in the `./Lefthook.yml`:
 - On Commit
-    - check  your code for formatting and linting errors
-    - type check your code for type errors
     - lint commit messages against Conventional Commit format
+    - run biome checks (formatting, linting, import sorting)
+    - typecheck with tsc
 - On Push
     - all the on-commit checks, plus:
-    - runs your tests
-    - checks your package types with AreTheTypesWrong
+    - are-the-types-wrong
+    - run tests and coverage
 
 ### Github CI / Workflows
-TODO
+A very simple ci workflow is provided in `./.github/workflows/ci.yml`. On each push or pull-request to the main branch, the following checks are made:
+- Run biome checks (formatting, linting, import sorting)
+- typecheck with tsc
+- are-the-types-wrong
+- run tests and coverage
 
-### VsCode Reccomended Plugins and Settings
-TODO
+By default, these checks are ran against all active and maintainance versions of node as well as ubuntu, macos and windows.
 
-###
+### Releases
+- TODO *in the future I will set up autmated releases with release-it*

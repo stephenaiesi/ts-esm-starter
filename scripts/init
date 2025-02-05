@@ -22,6 +22,10 @@ author="$author_name <$author_email>"
 # Update the package.json
 npm pkg set name="$name" description="$description" author="$author"
 
+# Update the README.md
+echo "# $name" > README.md
+echo "$description" >> README.md
+
 # Install dependencies
 npm install
 

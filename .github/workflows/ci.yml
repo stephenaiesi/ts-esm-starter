@@ -36,5 +36,8 @@ jobs:
       - name: 🔍 Format & Lint
         run: npm run biome:ci
 
+      -name: Are The Types Wrong?
+        run: npm run attw
+
       - name: 🧪 Run Tests with Coverage
         run: npm run test
