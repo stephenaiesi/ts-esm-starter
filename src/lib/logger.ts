@@ -1,4 +1,4 @@
-import { Logger, type ILogObj } from "tslog";
+import { type ILogObj, Logger } from "tslog";
 
 const log: Logger<ILogObj> = new Logger();
 

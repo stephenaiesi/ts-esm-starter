@@ -1,7 +1,7 @@
 pre-commit:
   parallel: true
   commands:
-    run-checks:
+    run-checks(format, lint, typecheck, attw):
       run: npm run check
 
 commit-msg:
@@ -12,9 +12,7 @@ commit-msg:
 pre-push:
   parallel: true
   commands:
-    check:
+    run-checks(format, lint, typecheck, attw):
       run: npm run check
-    are-the-types-wrong:
-      run: npm run attw
-    run-tests:
+    run-tests(vitest, coverage-v8):
       run: npm run test
