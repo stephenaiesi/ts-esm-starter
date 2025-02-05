@@ -30,7 +30,6 @@ jobs:
   
 
   typecheck:
-    needs: biome-checks
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -56,7 +55,7 @@ jobs:
 
 
   tests:
-    needs: typecheck
+    needs: [biome-checks, typecheck]
     name: Run tests and coverage on ${{ matrix.os }} with Node.js ${{ matrix.node }}
     runs-on: ${{ matrix.os }}
     
