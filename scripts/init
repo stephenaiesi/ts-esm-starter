@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# Read user input for package name:
+name=""
+while [ -z "$name" ]; do
+    echo "Enter package name:"
+    read -r name
+done
+
+# Read user input for package description:
+description=""
+while [ -z "$description" ]; do
+    echo "Enter package description:"
+    read -r description
+done
+
+# Dynamically set the package.json author from git configuration
+author_name="$(git config user.name)"
+author_email="$(git config user.email)"
+author="$author_name <$author_email>"
+
+# Update the package.json
+npm pkg set name="$name" description="$description" author="$author"
+
+# Install dependencies
+npm install
+
+# Delete the init script
+npm pkg delete scripts.init
+rm scripts/init
+
+# Commit the changes
+git add package.json package-lock.json scripts/init
+git commit -m "chore: initialized with scripts/init"
